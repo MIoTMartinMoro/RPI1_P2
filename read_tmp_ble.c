@@ -21,11 +21,13 @@ int main (int argc, char *argv[])
     FILE* fp;
     char* pch;
     char resp[1035];
-    char command[2000];
+    char command[200];
     uint16_t rawTAmb = 0;
     uint16_t rawTObj = 0;
     float tAmb;
     float tObj;
+
+    memset(command, '\0', 200);
 
     /* Crea el comando que va a ejecutar */
     strcat(command, "/usr/bin/gatttool -b ");
@@ -37,15 +39,18 @@ int main (int argc, char *argv[])
     strcat(command, " --char-read -a ");
     strcat(command, HANDL_TMP_READ);
 
-    fp = popen(command, "r");
+    printf("%s\n", command);
 
-    /* Lee la salida de los que escribe el comando */
-    while (fgets(resp, sizeof(resp)-1, fp) != NULL) {
-    }
-    pclose(fp);
+    
 
     /* Recoge los datos que nos interesa */
     do {
+        fp = popen(command, "r");
+        /* Lee la salida de los que escribe el comando */
+        while (fgets(resp, sizeof(resp)-1, fp) != NULL) {
+        }
+        pclose(fp);
+
         char* tempBytes = strchr(resp, ':') + 2;
         printf("%s\n", tempBytes);
         char strRawTAmb[6];
@@ -54,11 +59,16 @@ int main (int argc, char *argv[])
         memcpy(strRawTObj, &tempBytes[6], 5);
         strRawTAmb[5] = '\0';
         strRawTObj[5] = '\0';
-        printf("AMb%s\n", strRawTAmb);
-        printf("OBJ%s\n", strRawTObj);
-        rawTAmb = 3;
-        rawTObj = 3;
+        memmove(&strRawTAmb[2], &strRawTAmb[3], strlen(strRawTAmb)-2);
+        memmove(&strRawTObj[2], &strRawTObj[3], strlen(strRawTObj)-2);
+        printf("AMb %s\n", strRawTAmb);
+        printf("OBJ %s\n", strRawTObj);
+        rawTAmb = (uint16_t) strtol(strRawTAmb, NULL, 16);
+        rawTObj = (uint16_t) strtol(strRawTObj, NULL, 16);
     } while(rawTAmb == 0 && rawTObj == 0);
+
+    printf("Amb Bien: %d\n",rawTAmb);
+    printf("Obj Bien: %d\n",rawTObj);
 
 
     return 0;
