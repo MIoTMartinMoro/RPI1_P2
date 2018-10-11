@@ -16,6 +16,11 @@ void sensorTmp007Convert(uint16_t rawAmbTemp, uint16_t rawObjTemp, float* tAmb, 
     *tAmb = t * SCALE_LSB;
 }
 
+void fahrenheit_to_celsius(float* t_fah)
+{
+    *t_fah=(*t_fah-32)*5/9;
+}
+
 int main (int argc, char *argv[])
 {
     FILE* fp;
@@ -65,12 +70,22 @@ int main (int argc, char *argv[])
         printf("OBJ %s\n", strRawTObj);
         rawTAmb = (uint16_t) strtol(strRawTAmb, NULL, 16);
         rawTObj = (uint16_t) strtol(strRawTObj, NULL, 16);
+        printf("%d\n", rawTAmb);
+        printf("%d\n", rawTObj);
     } while(rawTAmb == 0 && rawTObj == 0);
 
-    printf("Amb Bien: %d\n",rawTAmb);
-    printf("Obj Bien: %d\n",rawTObj);
+    sensorTmp007Convert(rawTAmb, rawTObj, &tAmb, &tObj);
+
+    printf("Amb Bien: %f\n",tAmb);
+    printf("Obj Bien: %f\n",tObj);
+
+    fahrenheit_to_celsius(&tAmb);
+    fahrenheit_to_celsius(&tObj);
+
+    printf("Amb Conv Bien: %f\n",tAmb);
+    printf("Obj Conv Bien: %f\n",tObj);
 
 
     return 0;
-    /*sensorTmp007Convert();*/
+    
 }
