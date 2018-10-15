@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-float sensorOpt3001Convert(uint16_t rawData)
+float sensorOpt3001Convert (uint16_t rawData)
 {
     uint16_t e, m;
  
@@ -16,19 +16,16 @@ float sensorOpt3001Convert(uint16_t rawData)
     return m * (0.01 * e);
 }
 
-int main (int argc, char *argv[])
+float read_opt ()
 {
     FILE* fp;
     char* pch;
     char resp[1035];
     char command[200];
     uint16_t rawOpt = 0;
-    float data;
-
-    memset(command, '\0', 200);
-    memset(resp, '\0', 1035);
 
     /* Crea el comando que va a ejecutar */
+    memset(command, '\0', 200);
     strcat(command, "/usr/bin/gatttool -b ");
     strcat(command, BLE_MAC);
     strcat(command, " --char-write-req -a ");
@@ -38,37 +35,28 @@ int main (int argc, char *argv[])
     strcat(command, " --char-read -a ");
     strcat(command, HANDL_OPT_READ);
 
-    printf("%s\n", command);    
-
     /* Recoge los datos que nos interesa */
-    /*do {*/
+    do {
         fp = popen(command, "r");
         /* Lee la salida de los que escribe el comando */
         while (fgets(resp, sizeof(resp)-1, fp) != NULL) {
         }
         pclose(fp);
 
-        printf("%s\n", resp);
-
+        /* Parsea la salida para quedarse con los bytes que nos interesan (Está en formato Little Endian)*/
         char* optBytes = strchr(resp, ':') + 2;
         char strRawOpt[5];
+
         memset(strRawOpt, '\0', 5);
+        strRawOpt[0] = optBytes[3];
+        strRawOpt[1] = optBytes[4];
+        strRawOpt[2] = optBytes[0];
+        strRawOpt[3] = optBytes[1];
 
-        printf("%s\n", optBytes);
-
-        strRawOpt[0]=optBytes[3];
-        strRawOpt[1]=optBytes[4];
-        strRawOpt[2]=optBytes[0];
-        strRawOpt[3]=optBytes[1];
-
-        printf("%s\n", strRawOpt);
-
+        /* Pasa de string a unsigned int de 16 bits*/
         rawOpt = (uint16_t) strtol(strRawOpt, NULL, 16);
 
-    /*} while(rawOpt == 0);*/
+    } while(rawOpt == 0);
 
-    data = sensorOpt3001Convert(rawOpt);
-
-    printf("%f\n", data);
-    return 0;
+    return sensorOpt3001Convert(rawOpt);
 }
