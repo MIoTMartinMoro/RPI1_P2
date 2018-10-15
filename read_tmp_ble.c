@@ -52,16 +52,29 @@ int main (int argc, char *argv[])
         pclose(fp);
 
         char* tempBytes = strchr(resp, ':') + 2;
-        char strRawTAmb[6];
-        char strRawTObj[6];
-        memcpy(strRawTAmb, &tempBytes[0], 5);
-        memcpy(strRawTObj, &tempBytes[6], 5);
-        strRawTAmb[5] = '\0';
-        strRawTObj[5] = '\0';
-        memmove(&strRawTAmb[2], &strRawTAmb[3], strlen(strRawTAmb)-2);
-        memmove(&strRawTObj[2], &strRawTObj[3], strlen(strRawTObj)-2);
+        char strRawTAmb[5];
+        char strRawTObj[5];
+        memset(strRawTAmb, '\0', 5);
+        memset(strRawTObj, '\0', 5);
+
+        printf("%s\n", tempBytes);
+
+        strRawTAmb[0]=tempBytes[9];
+        strRawTAmb[1]=tempBytes[10];
+        strRawTAmb[2]=tempBytes[6];
+        strRawTAmb[3]=tempBytes[7];
+
+        strRawTObj[0]=tempBytes[3];
+        strRawTObj[1]=tempBytes[4];
+        strRawTObj[2]=tempBytes[0];
+        strRawTObj[3]=tempBytes[1];
+
         rawTAmb = (uint16_t) strtol(strRawTAmb, NULL, 16);
         rawTObj = (uint16_t) strtol(strRawTObj, NULL, 16);
+        printf("strAmb %s\n", strRawTAmb);
+        printf("%x\n", rawTAmb);
+        printf("strObj %s\n", strRawTObj);
+        printf("%x\n", rawTObj);
     } while(rawTAmb == 0 && rawTObj == 0);
 
     sensorTmp007Convert(rawTAmb, rawTObj, &tAmb, &tObj);
