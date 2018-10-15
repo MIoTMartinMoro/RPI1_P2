@@ -1,4 +1,4 @@
-/* FICHERO: read_ble.c
+/* FICHERO: read_tmp_ble.c
  * DESCRIPCION: codigo para leer temperatura del sensortag */
 
 #include "common.h"
@@ -16,7 +16,7 @@ void sensorTmp007Convert(uint16_t rawAmbTemp, uint16_t rawObjTemp, float* tAmb, 
     *tAmb = t * SCALE_LSB;
 }
 
-int main (int argc, char *argv[])
+void read_tmp (float* tAmb, float* tObj)
 {
     FILE* fp;
     char* pch;
@@ -24,8 +24,6 @@ int main (int argc, char *argv[])
     char command[200];
     uint16_t rawTAmb = 0;
     uint16_t rawTObj = 0;
-    float tAmb;
-    float tObj;
 
     memset(command, '\0', 200);
 
@@ -77,11 +75,8 @@ int main (int argc, char *argv[])
         printf("%x\n", rawTObj);
     } while(rawTAmb == 0 && rawTObj == 0);
 
-    sensorTmp007Convert(rawTAmb, rawTObj, &tAmb, &tObj);
+    sensorTmp007Convert(rawTAmb, rawTObj, tAmb, tObj);
 
     printf("Amb Conv Bien: %f\n",tAmb);
     printf("Obj Conv Bien: %f\n",tObj);
-
-
-    return 0;
 }
