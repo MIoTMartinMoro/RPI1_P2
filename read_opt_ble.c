@@ -1,5 +1,5 @@
 /* FICHERO: read_opt_ble.c
- * DESCRIPCION: codigo para leer temperatura del sensortag */
+ * DESCRIPCION: codigo para leer luminosidad del sensortag */
 
 #include "common.h"
 

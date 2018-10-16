@@ -9,4 +9,7 @@ int main (int argc, char *argv[]){
 	sleep(1);
 	printf("\n");
 	read_tmp();
+    sleep(1);
+    printf("\n");
+    read_bmp();
 }

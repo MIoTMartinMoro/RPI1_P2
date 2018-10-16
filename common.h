@@ -4,6 +4,7 @@
 #include <errno.h>
 
 typedef unsigned short int uint16_t;  /* Declara nuevo tipo unsigned int de 16 bits */
+typedef unsigned int uint32_t;        /* Declara nuevo tipo unsigned int de 32 bits */
 
 #define BLE_MAC_CARLOS 		"B0:91:22:F7:38:81"  /* Dirección MAC del SensorTag */
 #define BLE_MAC_ALDA 		"24:71:89:CC:1D:02"  /* Dirección MAC del SensorTag */
@@ -18,6 +19,9 @@ typedef unsigned short int uint16_t;  /* Declara nuevo tipo unsigned int de 16 b
 #define HANDL_HUM_WRITE   "0x2f"  /* Handle para activar el sensor de humedad */
 #define HANDL_HUM_READ    "0x2c"  /* Handle para leer del sensor de humedad */
 
+#define HANDL_BMP_WRITE   "0x37"  /* Handle para activar el sensor de presión */
+#define HANDL_BMP_READ    "0x34"  /* Handle para leer del sensor de presión */
+
 
 /*Funciones del sensor de temperatura*/
 void read_tmp ();
@@ -27,6 +31,10 @@ void sensorTmp007Convert(uint16_t rawAmbTemp, uint16_t rawObjTemp,
 /*Funciones del sensor óptico*/
 float read_opt();
 float sensorOpt3001Convert (uint16_t rawData);
+
+/*Funciones del sensor de presión*/
+void read_bmp();
+float sensorBmp280Convert(uint32_t rawValue);
 
 /*Funciones del sensor de humedad*/
 void read_hum();
