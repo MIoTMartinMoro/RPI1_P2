@@ -14,3 +14,6 @@ typedef unsigned short int uint16_t;  /* Declara nuevo tipo unsigned int de 16 b
 
 #define HANDL_OPT_WRITE   "0x47"  /* Handle para activar el sensor de óptica */
 #define HANDL_OPT_READ    "0x44"  /* Handle para leer del sensor de óptica */
+
+#define HANDL_HUM_WRITE   "0x2f"  /* Handle para activar el sensor de humedad */
+#define HANDL_HUM_READ    "0x2c"  /* Handle para leer del sensor de humedad */
