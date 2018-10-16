@@ -35,8 +35,10 @@ float read_opt ()
     strcat(command, " --char-read -a ");
     strcat(command, HANDL_OPT_READ);
 
+    printf("%s\n", command);
+
     /* Recoge los datos que nos interesa */
-    do {
+    /*do {*/
         fp = popen(command, "r");
         /* Lee la salida de los que escribe el comando */
         while (fgets(resp, sizeof(resp)-1, fp) != NULL) {
@@ -56,7 +58,9 @@ float read_opt ()
         /* Pasa de string a unsigned int de 16 bits*/
         rawOpt = (uint16_t) strtol(strRawOpt, NULL, 16);
 
-    } while(rawOpt == 0);
+    /*} while(rawOpt == 0);*/
+        float valor_fin=sensorOpt3001Convert(rawOpt);
+        printf("Luminosidad: %f\n", valor_fin);
 
-    return sensorOpt3001Convert(rawOpt);
+    return valor_fin;
 }

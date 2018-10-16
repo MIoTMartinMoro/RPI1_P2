@@ -1,10 +1,5 @@
 #include "common.h"
 
-void read_hum();
-void sensorHdc1000Convert(uint16_t rawTempFun, uint16_t rawHumFun,
-                        float *tempFun, float *humFun);
-
-
 /*Función de conversión de datos */
 void sensorHdc1000Convert(uint16_t rawTempFun, uint16_t rawHumFun,
                         float *tempFun, float *humFun)
@@ -20,15 +15,10 @@ void sensorHdc1000Convert(uint16_t rawTempFun, uint16_t rawHumFun,
 /*Función de cálculo de sensación térmica */
 void calculate_thermal_sesation(float tempFun, float humFun, float *senTermFun)
 {
-    printf("********* thermal sensation *********\n");
-    printf("%f\n", tempFun);
-    printf("%f\n", humFun);
     *senTermFun=-8.785+1.6139*tempFun+2.3385*humFun-0.1461*tempFun*humFun-
         0.0123*tempFun*tempFun-0.0164*humFun*humFun+0.0022*tempFun*tempFun*humFun+
         0.00073*humFun*humFun-0.0000036*tempFun*tempFun*humFun*humFun;
-    printf("%f\n", *senTermFun);
 }
-
 
 /*Función de leer la humedad del sensor */
 void read_hum ()
@@ -73,7 +63,7 @@ void read_hum ()
         memset(strRawHum, '\0', 5);
         memset(strRawTemp, '\0', 5);
 
-        printf("%s\n", tempBytes);
+        /*printf("%s\n", tempBytes);*/
 
         strRawHum[0]=tempBytes[9];
         strRawHum[1]=tempBytes[10];
@@ -93,9 +83,9 @@ void read_hum ()
     sensorHdc1000Convert(rawTemp, rawHum, &temp, &hum);
     calculate_thermal_sesation(temp, hum/100, &senTerm);
 
-    printf("temp Conv Bien: %f\n",temp);
-    printf("hum Conv Bien: %f\n",hum);
-    printf("sensacion termica Conv Bien: %f\n",senTerm);
+    printf("Temperatura: %f ºC\n",temp);
+    printf("Humedad Relativa: %f por ciento\n",hum);
+    printf("Sensación térmica: %f ºC\n",senTerm);
 
 
 }
