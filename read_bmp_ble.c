@@ -8,7 +8,7 @@ float sensorBmp280Convert(uint32_t rawValue)
     return rawValue / 100.0f;
 }
 
-void read_bmp ()
+float read_bmp (uint8_t value)
 {
     FILE* fp;
     char* pch;
@@ -16,8 +16,7 @@ void read_bmp ()
     char command[200];
     uint32_t rawPres = 0;
     uint32_t rawTemp = 0;
-    float temp;
-    float pres;
+    float data;
 
     /* Crea el comando que va a ejecutar */
     memset(command, '\0', 200);
@@ -30,8 +29,6 @@ void read_bmp ()
     strcat(command, " --char-read -a ");
     strcat(command, HANDL_BMP_READ);
 
-    printf("%s\n", command);
-
     /* Recoge los datos que nos interesa */
     do {
         fp = popen(command, "r");
@@ -40,7 +37,7 @@ void read_bmp ()
         }
         pclose(fp);
 
-        /* Parsea la salida para quedarse con los bytes que nos interesan (Está en formato Little Endian)*/
+        /* Parsea la salida para quedarse con los bytes que nos interesan (Está en formato Little Endian) */
         char* optBytes = strchr(resp, ':') + 2;
         char strRawPres[7];
         char strRawTemp[7];
@@ -61,12 +58,18 @@ void read_bmp ()
         strRawTemp[4] = optBytes[0];
         strRawTemp[5] = optBytes[1];
 
-        /* Pasa de string a unsigned int de 32 bits*/
+        /* Pasa de string a unsigned int de 32 bits */
         rawPres = (uint32_t) strtol(strRawPres, NULL, 16);
         rawTemp = (uint32_t) strtol(strRawTemp, NULL, 16);
 
     } while(rawTemp == 0 && rawPres == 0);
-    pres = sensorBmp280Convert(rawPres);
-    temp = sensorBmp280Convert(rawTemp);
-    printf("Temperatura: %f\nPresión: %f\n", temp, pres);
+
+    /* Convierte los datos y pasa el que se le pida */
+    if (value == BMP_VALUE) {
+        data = sensorBmp280Convert(rawPres);
+    } else if (value == AMB_TMP_VALUE) {
+        data = sensorBmp280Convert(rawTemp);
+    }
+
+    return data;  
 }

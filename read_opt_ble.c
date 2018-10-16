@@ -1,5 +1,5 @@
 /* FICHERO: read_opt_ble.c
- * DESCRIPCION: codigo para leer luminosidad del sensortag */
+ * DESCRIPCION: codigo para leer la luminosidad del sensortag */
 
 #include "common.h"
 
@@ -35,10 +35,8 @@ float read_opt ()
     strcat(command, " --char-read -a ");
     strcat(command, HANDL_OPT_READ);
 
-    printf("%s\n", command);
-
     /* Recoge los datos que nos interesa */
-    /*do {*/
+    do {
         fp = popen(command, "r");
         /* Lee la salida de los que escribe el comando */
         while (fgets(resp, sizeof(resp)-1, fp) != NULL) {
@@ -58,9 +56,8 @@ float read_opt ()
         /* Pasa de string a unsigned int de 16 bits*/
         rawOpt = (uint16_t) strtol(strRawOpt, NULL, 16);
 
-    /*} while(rawOpt == 0);*/
-        float valor_fin=sensorOpt3001Convert(rawOpt);
-        printf("Luminosidad: %f\n", valor_fin);
+    } while(rawOpt == 0);
 
-    return valor_fin;
+    /* Convierte el valor y lo pasa */
+    return sensorOpt3001Convert(rawOpt);
 }

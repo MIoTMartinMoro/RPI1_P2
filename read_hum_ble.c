@@ -1,3 +1,6 @@
+/* FICHERO: read_hum_ble.c
+ * DESCRIPCION: codigo para leer la humedad del sensortag */
+
 #include "common.h"
 
 /*Función de conversión de datos */
@@ -21,7 +24,7 @@ void calculate_thermal_sesation(float tempFun, float humFun, float *senTermFun)
 }
 
 /*Función de leer la humedad del sensor */
-void read_hum ()
+float read_hum (uint8_t value)
 {
     FILE* fp;
     char* pch;
@@ -31,23 +34,18 @@ void read_hum ()
     uint16_t rawTemp = 0;
     float temp;
     float hum;
-    float senTerm;
-
-    memset(command, '\0', 200);
+    float senTerm;    
 
     /* Crea el comando que va a ejecutar */
+    memset(command, '\0', 200);
     strcat(command, "/usr/bin/gatttool -b ");
     strcat(command, BLE_MAC);
     strcat(command, " --char-write-req -a ");
     strcat(command, HANDL_HUM_WRITE);
-    strcat(command, " -n 01; /usr/bin/gatttool -b ");
+    strcat(command, " -n 01; sleep 1; /usr/bin/gatttool -b ");
     strcat(command, BLE_MAC);
     strcat(command, " --char-read -a ");
     strcat(command, HANDL_HUM_READ);
-
-    printf("%s\n", command);
-
-    
 
     /* Recoge los datos que nos interesa */
     do {
@@ -57,35 +55,42 @@ void read_hum ()
         }
         pclose(fp);
 
+        /* Parsea la salida para quedarse con los bytes que nos interesan (Está en formato Little Endian) */
         char* tempBytes = strchr(resp, ':') + 2;
         char strRawHum[5];
         char strRawTemp[5];
+
         memset(strRawHum, '\0', 5);
+        strRawHum[0] = tempBytes[9];
+        strRawHum[1] = tempBytes[10];
+        strRawHum[2] = tempBytes[6];
+        strRawHum[3] = tempBytes[7];
+
         memset(strRawTemp, '\0', 5);
+        strRawTemp[0] = tempBytes[3];
+        strRawTemp[1] = tempBytes[4];
+        strRawTemp[2] = tempBytes[0];
+        strRawTemp[3] = tempBytes[1];
 
-        /*printf("%s\n", tempBytes);*/
-
-        strRawHum[0]=tempBytes[9];
-        strRawHum[1]=tempBytes[10];
-        strRawHum[2]=tempBytes[6];
-        strRawHum[3]=tempBytes[7];
-
-        strRawTemp[0]=tempBytes[3];
-        strRawTemp[1]=tempBytes[4];
-        strRawTemp[2]=tempBytes[0];
-        strRawTemp[3]=tempBytes[1];
-
+        /* Pasa de string a unsigned int de 16 bits*/
         rawHum = (uint16_t) strtol(strRawHum, NULL, 16);
         rawTemp = (uint16_t) strtol(strRawTemp, NULL, 16);
         
     } while(rawHum == 0 && rawTemp == 0);
 
+    /* Convierte los datos */
     sensorHdc1000Convert(rawTemp, rawHum, &temp, &hum);
+    /* Calcula la sensación térmica */
     calculate_thermal_sesation(temp, hum/100, &senTerm);
 
-    printf("Temperatura: %f ºC\n",temp);
-    printf("Humedad Relativa: %f por ciento\n",hum);
-    printf("Sensación térmica: %f ºC\n",senTerm);
+    /* Pasa el valor que se le pida */
+    if (value == AMB_TMP_VALUE) {
+        return temp;
+    } else if (value == HUM_VALUE) {
+        return hum;
+    } else if (value == SEN_TMP_VALUE) {
+        return senTerm;
+    }
 
-
+    return 0;
 }

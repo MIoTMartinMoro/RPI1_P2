@@ -1,45 +1,55 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 
+typedef unsigned char uint8_t;        /* Declara nuevo tipo unsigned int de 8 bits */
 typedef unsigned short int uint16_t;  /* Declara nuevo tipo unsigned int de 16 bits */
 typedef unsigned int uint32_t;        /* Declara nuevo tipo unsigned int de 32 bits */
 
-#define BLE_MAC_CARLOS 		"B0:91:22:F7:38:81"  /* Dirección MAC del SensorTag */
-#define BLE_MAC_ALDA 		"24:71:89:CC:1D:02"  /* Dirección MAC del SensorTag */
-#define BLE_MAC 			BLE_MAC_ALDA
+/************************************************************************************************/
+/* MACs */
+#define BLE_MAC_ALDA        "24:71:89:CC:1D:02"  /* Dirección MAC del SensorTag */
+#define BLE_MAC_CARLOS      "B0:91:22:F7:38:81"  /* Dirección MAC del SensorTag */
+#define BLE_MAC             BLE_MAC_ALDA
 
-#define HANDL_TMP_WRITE   "0x27"  /* Handle para activar el sensor de temperatura */
-#define HANDL_TMP_READ    "0x24"  /* Handle para leer del sensor de temperatura */
+/************************************************************************************************/
+/* Valores a pedir */
+#define AMB_TMP_VALUE   0x95
+#define BMP_VALUE       0x96
+#define HUM_VALUE       0x97
+#define OBJ_TMP_VALUE   0x98
+#define SEN_TMP_VALUE   0x99
 
-#define HANDL_OPT_WRITE   "0x47"  /* Handle para activar el sensor óptico */
-#define HANDL_OPT_READ    "0x44"  /* Handle para leer del sensor óptico */
+/************************************************************************************************/
+/* Handles */
+#define HANDL_BMP_WRITE   "0x37"  /* Handle para activar el sensor de presión */
+#define HANDL_BMP_READ    "0x34"  /* Handle para leer del sensor de presión */
 
 #define HANDL_HUM_WRITE   "0x2f"  /* Handle para activar el sensor de humedad */
 #define HANDL_HUM_READ    "0x2c"  /* Handle para leer del sensor de humedad */
 
-#define HANDL_BMP_WRITE   "0x37"  /* Handle para activar el sensor de presión */
-#define HANDL_BMP_READ    "0x34"  /* Handle para leer del sensor de presión */
+#define HANDL_OPT_WRITE   "0x47"  /* Handle para activar el sensor óptico */
+#define HANDL_OPT_READ    "0x44"  /* Handle para leer del sensor óptico */
 
+#define HANDL_TMP_WRITE   "0x27"  /* Handle para activar el sensor de temperatura */
+#define HANDL_TMP_READ    "0x24"  /* Handle para leer del sensor de temperatura */
 
-/*Funciones del sensor de temperatura*/
-void read_tmp ();
-void sensorTmp007Convert(uint16_t rawAmbTemp, uint16_t rawObjTemp, 
-						float* tAmb, float* tObj);
+/************************************************************************************************/
+/* Funciones de los sensores */
+/* Temperatura */
+float read_tmp (uint8_t value);
+void sensorTmp007Convert(uint16_t rawAmbTemp, uint16_t rawObjTemp, float* tAmb, float* tObj);
 
-/*Funciones del sensor óptico*/
+/* Luminosidad */
 float read_opt();
 float sensorOpt3001Convert (uint16_t rawData);
 
-/*Funciones del sensor de presión*/
-void read_bmp();
+/* Presión */
+float read_bmp(uint8_t value);
 float sensorBmp280Convert(uint32_t rawValue);
 
-/*Funciones del sensor de humedad*/
-void read_hum();
-void sensorHdc1000Convert(uint16_t rawTempFun, uint16_t rawHumFun,
-                        float *tempFun, float *humFun);
+/* Humedad */
+float read_hum(uint8_t value);
+void sensorHdc1000Convert(uint16_t rawTempFun, uint16_t rawHumFun, float *tempFun, float *humFun);
 void calculate_thermal_sesation(float tempFun, float humFun, float *senTermFun);
-
-
