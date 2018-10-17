@@ -4,7 +4,7 @@
 #include "common.h"
 #include <time.h>
 
-#define PUERTO_LOCAL PUERTO  /* puerto local en el servidor por el que se reciben los mensajes */
+//#define PUERTO_LOCAL PUERTO  /* puerto local en el servidor por el que se reciben los mensajes */
 
 int main (int argc, char* argv[])
 {
@@ -18,6 +18,15 @@ int main (int argc, char* argv[])
         int error;                      /* indica la existencia de un error */
         int cont;
         size_t sin_size;
+        int puerto;                     /* puerto local en el servidor por el que se reciben los mensajes */
+
+
+        if (argc != 1)
+        {
+                fprintf (stderr, "uso: puerto\n");
+                exit (1);
+        }
+        puerto = argv[0];
 
         /* crea el socket */
         if ((sockfd = socket (AF_INET, SOCK_DGRAM, 0)) == -1)
@@ -25,9 +34,10 @@ int main (int argc, char* argv[])
                 perror ("socket");
                 exit (1);
         }
+    
 
         my_addr.sin_family = AF_INET;  /* Familia: ordenacion de bytes de la maquina */
-        my_addr.sin_port = htons (PUERTO_LOCAL);  /* Puerto: ordenacion de bytes de la red */
+        my_addr.sin_port = htons (puerto);  /* Puerto: ordenacion de bytes de la red */
         my_addr.sin_addr.s_addr = INADDR_ANY;     /* IP: ordenacion de bytes de la red */
         memset (&(my_addr.sin_zero), '\0', 8);  /* Pone a cero el resto de la estructura */
 
@@ -72,38 +82,53 @@ int main (int argc, char* argv[])
                 resultado.id = operation->id; /* id */
                 switch (operation->op)
                 {
-                case OP_MINUSCULAS: /* minusculas */
+                case AMB_TMP_VALUE: /* temperatura ambiente */
                         resultado.op = OP_RESULTADO; /* op */
+                        float tAmb = read_tmp(AMB_TMP_VALUE);
                         for(cont = 0; cont < operation->len; cont++){ /* data */
-                                if (isupper(operation->data[cont]))
-                                        resultado.data[cont] = tolower(operation->data[cont]);
-                                else
-                                        resultado.data[cont] = operation->data[cont];
+                                resultado.data[cont]=tAmb[cont];
                         }
-                        resultado.len = cont; /* len */
+                        resultado.len = strlen(resultado.data); /* len */
                         break;
-                case OP_MAYUSCULAS: /* mayusculas */
+                case BMP_VALUE: /* mayusculas */
                         resultado.op = OP_RESULTADO; /* op */
+                        float bmp = read_bmp(BMP_VALUE);
                         for(cont = 0; cont < operation->len; cont++){ /* data */
-                                if (islower(operation->data[cont]))
-                                        resultado.data[cont] = toupper(operation->data[cont]);
-                                else
-                                        resultado.data[cont] = operation->data[cont];
+                                resultado.data[cont]=bmp[cont];
                         }
-                        resultado.len = cont; /* len */
+                        resultado.len = strlen(resultado.data); /* len */
                         break;
-                case OP_HORA:
+                case HUM_VALUE:
                         resultado.op=OP_RESULTADO;
-                        time_t t;
-                        struct tm *tm;
-                        char fechayhora[100];
-                        t=time(NULL);
-                        tm=localtime(&t);
-                        strftime(fechayhora, 100, "%d/%m/%Y %H:%M:%S", tm);
+                        float hum = read_hum(HUM_VALUE);
                         for(cont = 0; cont < operation->len; cont++){ /* data */
-                            resultado.data[cont] = fechayhora[cont];
+                                resultado.data[cont]=hum[cont];
                         }
-                        resultado.len=strlen(resultado.data);
+                        resultado.len = strlen(resultado.data); /* len */
+                        break;
+                case OBJ_TMP_VALUE:
+                        resultado.op=OP_RESULTADO;
+                        float tObj = read_tmp(OBJ_TMP_VALUE);
+                        for(cont = 0; cont < operation->len; cont++){ /* data */
+                                resultado.data[cont]=tObj[cont];
+                        }
+                        resultado.len = strlen(resultado.data); /* len */
+                        break;
+                case OPT_TMP_VALUE:
+                        resultado.op=OP_RESULTADO;
+                        float opt = read_opt();
+                        for(cont = 0; cont < operation->len; cont++){ /* data */
+                                resultado.data[cont]=opt[cont];
+                        }
+                        resultado.len = strlen(resultado.data); /* len */
+                        break;
+                case SEN_TMP_VALUE:
+                        resultado.op=OP_RESULTADO;
+                        float sentT = read_hum(SEN_TMP_VALUE);
+                        for(cont = 0; cont < operation->len; cont++){ /* data */
+                                resultado.data[cont]=sentT[cont];
+                        }
+                        resultado.len = strlen(resultado.data); /* len */
                         break;
                 default: /* operacion desconocida */
                         resultado.op = OP_ERROR; /* op */
