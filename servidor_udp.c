@@ -4,7 +4,7 @@
 #include "common.h"
 #include <time.h>
 
-//#define PUERTO_LOCAL PUERTO  /* puerto local en el servidor por el que se reciben los mensajes */
+#define PUERTO_LOCAL PUERTO  /* puerto local en el servidor por el que se reciben los mensajes */
 
 int main (int argc, char* argv[])
 {
@@ -21,12 +21,12 @@ int main (int argc, char* argv[])
         int puerto;                     /* puerto local en el servidor por el que se reciben los mensajes */
 
 
-        if (argc != 1)
+        if (argc != 2)
         {
                 fprintf (stderr, "uso: puerto\n");
                 exit (1);
         }
-        puerto = argv[0];
+        puerto = (uint16_t) strtol(argv[1], NULL, 10);
 
         /* crea el socket */
         if ((sockfd = socket (AF_INET, SOCK_DGRAM, 0)) == -1)
@@ -85,49 +85,38 @@ int main (int argc, char* argv[])
                 case AMB_TMP_VALUE: /* temperatura ambiente */
                         resultado.op = OP_RESULTADO; /* op */
                         float tAmb = read_tmp(AMB_TMP_VALUE);
-                        for(cont = 0; cont < operation->len; cont++){ /* data */
-                                resultado.data[cont]=tAmb[cont];
-                        }
+                        gcvt(tAmb, 10, resultado.data);
                         resultado.len = strlen(resultado.data); /* len */
                         break;
                 case BMP_VALUE: /* mayusculas */
+                        printf("Entra en presion \n");
                         resultado.op = OP_RESULTADO; /* op */
                         float bmp = read_bmp(BMP_VALUE);
-                        for(cont = 0; cont < operation->len; cont++){ /* data */
-                                resultado.data[cont]=bmp[cont];
-                        }
+                        gcvt(bmp, 10, resultado.data);
                         resultado.len = strlen(resultado.data); /* len */
                         break;
                 case HUM_VALUE:
                         resultado.op=OP_RESULTADO;
                         float hum = read_hum(HUM_VALUE);
-                        for(cont = 0; cont < operation->len; cont++){ /* data */
-                                resultado.data[cont]=hum[cont];
-                        }
+                        gcvt(hum, 10, resultado.data);
                         resultado.len = strlen(resultado.data); /* len */
                         break;
                 case OBJ_TMP_VALUE:
                         resultado.op=OP_RESULTADO;
                         float tObj = read_tmp(OBJ_TMP_VALUE);
-                        for(cont = 0; cont < operation->len; cont++){ /* data */
-                                resultado.data[cont]=tObj[cont];
-                        }
+                        gcvt(tObj, 10, resultado.data);
                         resultado.len = strlen(resultado.data); /* len */
                         break;
                 case OPT_TMP_VALUE:
                         resultado.op=OP_RESULTADO;
                         float opt = read_opt();
-                        for(cont = 0; cont < operation->len; cont++){ /* data */
-                                resultado.data[cont]=opt[cont];
-                        }
+                        gcvt(opt, 10, resultado.data);
                         resultado.len = strlen(resultado.data); /* len */
                         break;
                 case SEN_TMP_VALUE:
                         resultado.op=OP_RESULTADO;
                         float sentT = read_hum(SEN_TMP_VALUE);
-                        for(cont = 0; cont < operation->len; cont++){ /* data */
-                                resultado.data[cont]=sentT[cont];
-                        }
+                        gcvt(sentT, 10, resultado.data);
                         resultado.len = strlen(resultado.data); /* len */
                         break;
                 default: /* operacion desconocida */

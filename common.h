@@ -30,6 +30,7 @@ typedef unsigned int uint32_t;        /* Declara nuevo tipo unsigned int de 32 b
 #define OPT_TMP_VALUE   0x99
 #define SEN_TMP_VALUE   0xA0
 #define OP_ERROR        0xFF  /* error */
+#define OP_RESULTADO	0xBB
 
 /************************************************************************************************/
 /* Handles */

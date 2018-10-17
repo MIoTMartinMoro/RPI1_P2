@@ -22,7 +22,7 @@ int main (int argc, char *argv[])
         exit (1);
     }
 
-    puerto = argv[3];
+    puerto = (uint16_t) strtol(argv[3], NULL, 10);
 
     /* crea el socket */
     if ((sockfd = socket (AF_INET, SOCK_DGRAM, 0)) == -1)
