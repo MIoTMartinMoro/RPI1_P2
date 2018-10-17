@@ -1,7 +1,15 @@
+#include <arpa/inet.h>
+#include <ctype.h>
 #include <errno.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 typedef unsigned char uint8_t;        /* Declara nuevo tipo unsigned int de 8 bits */
 typedef unsigned short int uint16_t;  /* Declara nuevo tipo unsigned int de 16 bits */
@@ -21,6 +29,7 @@ typedef unsigned int uint32_t;        /* Declara nuevo tipo unsigned int de 32 b
 #define OBJ_TMP_VALUE   0x98
 #define OPT_TMP_VALUE   0x99
 #define SEN_TMP_VALUE   0xA0
+#define OP_ERROR        0xFF  /* error */
 
 /************************************************************************************************/
 /* Handles */
@@ -35,6 +44,23 @@ typedef unsigned int uint32_t;        /* Declara nuevo tipo unsigned int de 32 b
 
 #define HANDL_TMP_WRITE   "0x27"  /* Handle para activar el sensor de temperatura */
 #define HANDL_TMP_READ    "0x24"  /* Handle para leer del sensor de temperatura */
+
+/************************************************************************************************/
+/* Datos para el servidor */
+#define PUERTO 3490     /* puerto en el servidor */
+#define BACKLOG 10      /* numero maximo de conexiones pendientes en cola */
+#define MAXDATASIZE 256 /* maximo numero de bytes que podemos recibir */
+
+#define ID_HEADER_LEN sizeof (uint8_t) * 2 + sizeof(uint16_t)
+
+/* formato de la unidad de datos de aplicacion para Datagramas*/
+struct idappdata
+{
+        uint8_t op;                               /* codigo de operacion */
+        uint8_t id;                               /* identificador */
+        uint16_t len;                             /* longitud de datos */
+        char data[MAXDATASIZE - ID_HEADER_LEN];   /* datos */
+};
 
 /************************************************************************************************/
 /* Funciones de los sensores */
@@ -54,20 +80,3 @@ float sensorBmp280Convert(uint32_t rawValue);
 float read_hum(uint8_t value);
 void sensorHdc1000Convert(uint16_t rawTempFun, uint16_t rawHumFun, float *tempFun, float *humFun);
 void calculate_thermal_sesation(float tempFun, float humFun, float *senTermFun);
-
-/************************************************************************************************/
-/* Datos para el servidor */
-#define PUERTO 3490     /* puerto en el servidor */
-#define BACKLOG 10      /* numero maximo de conexiones pendientes en cola */
-#define MAXDATASIZE 256 /* maximo numero de bytes que podemos recibir */
-
-#define HEADER_LEN (sizeof(unsigned short) * 2)
-#define FILE_LEN 20
-
-/* formato de la unidad de datos de aplicacion para Stream*/
-struct appdata
-{
-        unsigned short op;                       /* codigo de operacion */
-        unsigned short len;                      /* longitud de datos */
-        char data[MAXDATASIZE - HEADER_LEN];     /* datos */
-};
