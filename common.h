@@ -19,7 +19,8 @@ typedef unsigned int uint32_t;        /* Declara nuevo tipo unsigned int de 32 b
 #define BMP_VALUE       0x96
 #define HUM_VALUE       0x97
 #define OBJ_TMP_VALUE   0x98
-#define SEN_TMP_VALUE   0x99
+#define OPT_TMP_VALUE   0x99
+#define SEN_TMP_VALUE   0xA0
 
 /************************************************************************************************/
 /* Handles */
@@ -53,3 +54,20 @@ float sensorBmp280Convert(uint32_t rawValue);
 float read_hum(uint8_t value);
 void sensorHdc1000Convert(uint16_t rawTempFun, uint16_t rawHumFun, float *tempFun, float *humFun);
 void calculate_thermal_sesation(float tempFun, float humFun, float *senTermFun);
+
+/************************************************************************************************/
+/* Datos para el servidor */
+#define PUERTO 3490     /* puerto en el servidor */
+#define BACKLOG 10      /* numero maximo de conexiones pendientes en cola */
+#define MAXDATASIZE 256 /* maximo numero de bytes que podemos recibir */
+
+#define HEADER_LEN (sizeof(unsigned short) * 2)
+#define FILE_LEN 20
+
+/* formato de la unidad de datos de aplicacion para Stream*/
+struct appdata
+{
+        unsigned short op;                       /* codigo de operacion */
+        unsigned short len;                      /* longitud de datos */
+        char data[MAXDATASIZE - HEADER_LEN];     /* datos */
+};
