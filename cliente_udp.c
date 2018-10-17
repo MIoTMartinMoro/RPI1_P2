@@ -54,8 +54,8 @@ int main (int argc, char *argv[])
     if (strcmp(argv[1], "temperatura_ambiente") == 0){
         strcpy(operation.data, "Temperatura ambiente");
         operation.op = AMB_TMP_VALUE;
-    } else if (strcmp(argv[1], "Temperatura objeto") == 0){
-        strcpy(operation.data, "Esta es Una PRUEBA");
+    } else if (strcmp(argv[1], "temperatura_objeto") == 0){
+        strcpy(operation.data, "Temperatura objeto");
         operation.op = OBJ_TMP_VALUE;
     } else if (strcmp(argv[1], "presion") == 0) {
         strcpy(operation.data, "Presion");
