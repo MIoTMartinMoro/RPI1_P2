@@ -52,32 +52,32 @@ typedef unsigned int uint32_t;        /* Declara nuevo tipo unsigned int de 32 b
 #define BACKLOG 10      /* numero maximo de conexiones pendientes en cola */
 #define MAXDATASIZE 256 /* maximo numero de bytes que podemos recibir */
 
-#define ID_HEADER_LEN sizeof (uint8_t) * 2 + sizeof(uint16_t)
+#define ID_HEADER_LEN sizeof (uint8_t) * 3
 
 /* formato de la unidad de datos de aplicacion para Datagramas*/
 struct idappdata
 {
         uint8_t op;                               /* codigo de operacion */
         uint8_t id;                               /* identificador */
-        uint16_t len;                             /* longitud de datos */
+        uint8_t len;                             /* longitud de datos */
         char data[MAXDATASIZE - ID_HEADER_LEN];   /* datos */
 };
 
 /************************************************************************************************/
 /* Funciones de los sensores */
 /* Temperatura */
-float read_tmp (uint8_t value);
+float read_tmp (uint8_t value, uint8_t* op);
 void sensorTmp007Convert(uint16_t rawAmbTemp, uint16_t rawObjTemp, float* tAmb, float* tObj);
 
 /* Luminosidad */
-float read_opt();
+float read_opt(uint8_t* op);
 float sensorOpt3001Convert (uint16_t rawData);
 
 /* Presión */
-float read_bmp(uint8_t value);
+float read_bmp(uint8_t value, uint8_t* op);
 float sensorBmp280Convert(uint32_t rawValue);
 
 /* Humedad */
-float read_hum(uint8_t value);
+float read_hum(uint8_t value, uint8_t* op);
 void sensorHdc1000Convert(uint16_t rawTempFun, uint16_t rawHumFun, float *tempFun, float *humFun);
 void calculate_thermal_sesation(float tempFun, float humFun, float *senTermFun);

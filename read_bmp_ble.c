@@ -8,11 +8,12 @@ float sensorBmp280Convert(uint32_t rawValue)
     return rawValue / 100.0f;
 }
 
-float read_bmp (uint8_t value)
+float read_bmp (uint8_t value, uint8_t* op)
 {
     FILE* fp;
     char* pch;
     char resp[1035];
+    char resp_error[1035];
     char command[200];
     uint32_t rawPres = 0;
     uint32_t rawTemp = 0;
@@ -37,26 +38,35 @@ float read_bmp (uint8_t value)
         }
         pclose(fp);
 
+        /* Comprueba si hay error en la lectura */
+        strcpy(resp_error, resp);
+        if (strcmp(strtok(resp_error, ":"), "Characteristic value/descriptor") != 0) {
+            // Si hay error se manda un 0 y si se ha pasado la operación se dice que es error
+            if (op != NULL) *op = OP_ERROR;
+            return 0;
+        }
+        if (op != NULL) *op = OP_RESULTADO;  // Si se ha pasado la operación se dice que pasa el resultado
+
         /* Parsea la salida para quedarse con los bytes que nos interesan (Está en formato Little Endian) */
-        char* optBytes = strchr(resp, ':') + 2;
+        char* bmpBytes = strchr(resp, ':') + 2;
         char strRawPres[7];
         char strRawTemp[7];
 
         memset(strRawPres, '\0', 7);
-        strRawPres[0] = optBytes[15];
-        strRawPres[1] = optBytes[16];
-        strRawPres[2] = optBytes[12];
-        strRawPres[3] = optBytes[13];
-        strRawPres[4] = optBytes[9];
-        strRawPres[5] = optBytes[10];
+        strRawPres[0] = bmpBytes[15];
+        strRawPres[1] = bmpBytes[16];
+        strRawPres[2] = bmpBytes[12];
+        strRawPres[3] = bmpBytes[13];
+        strRawPres[4] = bmpBytes[9];
+        strRawPres[5] = bmpBytes[10];
 
         memset(strRawTemp, '\0', 7);
-        strRawTemp[0] = optBytes[6];
-        strRawTemp[1] = optBytes[7];
-        strRawTemp[2] = optBytes[3];
-        strRawTemp[3] = optBytes[4];
-        strRawTemp[4] = optBytes[0];
-        strRawTemp[5] = optBytes[1];
+        strRawTemp[0] = bmpBytes[6];
+        strRawTemp[1] = bmpBytes[7];
+        strRawTemp[2] = bmpBytes[3];
+        strRawTemp[3] = bmpBytes[4];
+        strRawTemp[4] = bmpBytes[0];
+        strRawTemp[5] = bmpBytes[1];
 
         /* Pasa de string a unsigned int de 32 bits */
         rawPres = (uint32_t) strtol(strRawPres, NULL, 16);

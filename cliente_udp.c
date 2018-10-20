@@ -13,7 +13,7 @@ int main (int argc, char *argv[])
     struct idappdata *resultado;    /* mensaje de respuesta recibido */
     int numbytes;                   /* numero de bytes recibidos o enviados */
     size_t sin_size;
-    int puerto;
+    uint16_t puerto;
 
     if (argc != 4)
     {
@@ -44,9 +44,6 @@ int main (int argc, char *argv[])
     my_addr.sin_addr.s_addr = INADDR_ANY;            /* IP: ordenacion de bytes de la red */
         
     bind( sockfd, (void*) &my_addr, sizeof( struct sockaddr_in) );
-
-    memset (buf, '\0', MAXDATASIZE); /* Pone a cero el buffer inicialmente */
-
 
     memset (buf, '\0', MAXDATASIZE); /* Pone a cero el buffer inicialmente */
 

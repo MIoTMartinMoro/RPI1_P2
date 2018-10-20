@@ -14,9 +14,8 @@ int main (int argc, char* argv[])
     struct idappdata *operation;    /* mensaje de operacion recibido */
     struct idappdata resultado;     /* mensaje de respuesta enviado */
     int error;                      /* indica la existencia de un error */
-    int cont;
     size_t sin_size;
-    int puerto;                     /* puerto local en el servidor por el que se reciben los mensajes */
+    uint16_t puerto;                /* puerto local en el servidor por el que se reciben los mensajes */
 
 
     if (argc != 2)
@@ -80,40 +79,40 @@ int main (int argc, char* argv[])
         resultado.id = operation->id; /* id */
         switch (operation->op)
         {
-        case AMB_TMP_VALUE:
-            resultado.op = OP_RESULTADO;
-            float tAmb = read_tmp(AMB_TMP_VALUE);
+        case AMB_TMP_VALUE: ;
+            float tAmb = read_tmp(AMB_TMP_VALUE, &resultado.op);
             gcvt(tAmb, 10, resultado.data);
+            if (resultado.op == OP_ERROR) strcpy(resultado.data, "Error de lectura");
             resultado.len = strlen(resultado.data);
             break;
-        case BMP_VALUE:
-            resultado.op = OP_RESULTADO;
-            float bmp = read_bmp(BMP_VALUE);
+        case BMP_VALUE: ;
+            float bmp = read_bmp(BMP_VALUE, &resultado.op);
             gcvt(bmp, 10, resultado.data);
+            if (resultado.op == OP_ERROR) strcpy(resultado.data, "Error de lectura");
             resultado.len = strlen(resultado.data);
             break;
-        case HUM_VALUE:
-            resultado.op=OP_RESULTADO;
-            float hum = read_hum(HUM_VALUE);
+        case HUM_VALUE: ;
+            float hum = read_hum(HUM_VALUE, &resultado.op);
             gcvt(hum, 10, resultado.data);
+            if (resultado.op == OP_ERROR) strcpy(resultado.data, "Error de lectura");
             resultado.len = strlen(resultado.data);
             break;
-        case OBJ_TMP_VALUE:
-            resultado.op=OP_RESULTADO;
-            float tObj = read_tmp(OBJ_TMP_VALUE);
+        case OBJ_TMP_VALUE: ;
+            float tObj = read_tmp(OBJ_TMP_VALUE, &resultado.op);
             gcvt(tObj, 10, resultado.data);
+            if (resultado.op == OP_ERROR) strcpy(resultado.data, "Error de lectura");
             resultado.len = strlen(resultado.data);
             break;
-        case OPT_TMP_VALUE:
-            resultado.op=OP_RESULTADO;
-            float opt = read_opt();
+        case OPT_TMP_VALUE: ;
+            float opt = read_opt(&resultado.op);
             gcvt(opt, 10, resultado.data);
+            if (resultado.op == OP_ERROR) strcpy(resultado.data, "Error de lectura");
             resultado.len = strlen(resultado.data);
             break;
-        case SEN_TMP_VALUE:
-            resultado.op=OP_RESULTADO;
-            float sentT = read_hum(SEN_TMP_VALUE);
+        case SEN_TMP_VALUE: ;
+            float sentT = read_hum(SEN_TMP_VALUE, &resultado.op);
             gcvt(sentT, 10, resultado.data);
+            if (resultado.op == OP_ERROR) strcpy(resultado.data, "Error de lectura");
             resultado.len = strlen(resultado.data);
             break;
         default: /* operacion desconocida */

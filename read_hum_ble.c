@@ -24,11 +24,12 @@ void calculate_thermal_sesation(float tempFun, float humFun, float *senTermFun)
 }
 
 /*Función de leer la humedad del sensor */
-float read_hum (uint8_t value)
+float read_hum (uint8_t value, uint8_t* op)
 {
     FILE* fp;
     char* pch;
     char resp[1035];
+    char resp_error[1035];
     char command[200];
     uint16_t rawHum = 0;
     uint16_t rawTemp = 0;
@@ -55,22 +56,31 @@ float read_hum (uint8_t value)
         }
         pclose(fp);
 
+        /* Comprueba si hay error en la lectura */
+        strcpy(resp_error, resp);
+        if (strcmp(strtok(resp_error, ":"), "Characteristic value/descriptor") != 0) {
+            // Si hay error se manda un 0 y si se ha pasado la operación se dice que es error
+            if (op != NULL) *op = OP_ERROR;
+            return 0;
+        }
+        if (op != NULL) *op = OP_RESULTADO;  // Si se ha pasado la operación se dice que pasa el resultado
+
         /* Parsea la salida para quedarse con los bytes que nos interesan (Está en formato Little Endian) */
-        char* tempBytes = strchr(resp, ':') + 2;
+        char* humBytes = strchr(resp, ':') + 2;
         char strRawHum[5];
         char strRawTemp[5];
 
         memset(strRawHum, '\0', 5);
-        strRawHum[0] = tempBytes[9];
-        strRawHum[1] = tempBytes[10];
-        strRawHum[2] = tempBytes[6];
-        strRawHum[3] = tempBytes[7];
+        strRawHum[0] = humBytes[9];
+        strRawHum[1] = humBytes[10];
+        strRawHum[2] = humBytes[6];
+        strRawHum[3] = humBytes[7];
 
         memset(strRawTemp, '\0', 5);
-        strRawTemp[0] = tempBytes[3];
-        strRawTemp[1] = tempBytes[4];
-        strRawTemp[2] = tempBytes[0];
-        strRawTemp[3] = tempBytes[1];
+        strRawTemp[0] = humBytes[3];
+        strRawTemp[1] = humBytes[4];
+        strRawTemp[2] = humBytes[0];
+        strRawTemp[3] = humBytes[1];
 
         /* Pasa de string a unsigned int de 16 bits*/
         rawHum = (uint16_t) strtol(strRawHum, NULL, 16);

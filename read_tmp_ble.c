@@ -16,11 +16,12 @@ void sensorTmp007Convert(uint16_t rawAmbTemp, uint16_t rawObjTemp, float* tAmb, 
     *tAmb = t * SCALE_LSB;
 }
 
-float read_tmp (uint8_t value)
+float read_tmp (uint8_t value, uint8_t* op)
 {
     FILE* fp;
     char* pch;
     char resp[1035];
+    char resp_error[1035];
     char command[200];
     uint16_t rawTAmb = 0;
     uint16_t rawTObj = 0;
@@ -45,6 +46,15 @@ float read_tmp (uint8_t value)
         while (fgets(resp, sizeof(resp)-1, fp) != NULL) {
         }
         pclose(fp);
+
+        /* Comprueba si hay error en la lectura */
+        strcpy(resp_error, resp);
+        if (strcmp(strtok(resp_error, ":"), "Characteristic value/descriptor") != 0) {
+            // Si hay error se manda un 0 y si se ha pasado la operación se dice que es error
+            if (op != NULL) *op = OP_ERROR;
+            return 0;
+        }
+        if (op != NULL) *op = OP_RESULTADO;  // Si se ha pasado la operación se dice que pasa el resultado
 
         /* Parsea la salida para quedarse con los bytes que nos interesan (Está en formato Little Endian) */
         char* tempBytes = strchr(resp, ':') + 2;

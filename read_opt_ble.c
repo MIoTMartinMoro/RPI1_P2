@@ -16,11 +16,12 @@ float sensorOpt3001Convert (uint16_t rawData)
     return m * (0.01 * e);
 }
 
-float read_opt ()
+float read_opt (uint8_t* op)
 {
     FILE* fp;
     char* pch;
     char resp[1035];
+    char resp_error[1035];
     char command[200];
     uint16_t rawOpt = 0;
 
@@ -42,6 +43,15 @@ float read_opt ()
         while (fgets(resp, sizeof(resp)-1, fp) != NULL) {
         }
         pclose(fp);
+
+        /* Comprueba si hay error en la lectura */
+        strcpy(resp_error, resp);
+        if (strcmp(strtok(resp_error, ":"), "Characteristic value/descriptor") != 0) {
+            // Si hay error se manda un 0 y si se ha pasado la operación se dice que es error
+            if (op != NULL) *op = OP_ERROR;
+            return 0;
+        }
+        if (op != NULL) *op = OP_RESULTADO;  // Si se ha pasado la operación se dice que pasa el resultado
 
         /* Parsea la salida para quedarse con los bytes que nos interesan (Está en formato Little Endian)*/
         char* optBytes = strchr(resp, ':') + 2;
