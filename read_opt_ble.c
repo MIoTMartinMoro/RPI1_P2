@@ -21,7 +21,7 @@ float read_opt (uint8_t* op)
     FILE* fp;
     char* pch;
     char resp[1035];
-    char resp_error[1035];
+    char respError[1035];
     char command[200];
     uint16_t rawOpt = 0;
 
@@ -45,8 +45,8 @@ float read_opt (uint8_t* op)
         pclose(fp);
 
         /* Comprueba si hay error en la lectura */
-        strcpy(resp_error, resp);
-        if (strcmp(strtok(resp_error, ":"), "Characteristic value/descriptor") != 0) {
+        strcpy(respError, resp);
+        if (strlen(resp) == 0|| strcmp(strtok(respError, ":"), "Characteristic value/descriptor") != 0) {
             // Si hay error se manda un 0 y si se ha pasado la operación se dice que es error
             if (op != NULL) *op = OP_ERROR;
             return 0;

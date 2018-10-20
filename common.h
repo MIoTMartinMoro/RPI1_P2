@@ -57,10 +57,10 @@ typedef unsigned int uint32_t;        /* Declara nuevo tipo unsigned int de 32 b
 /* formato de la unidad de datos de aplicacion para Datagramas*/
 struct idappdata
 {
-        uint8_t op;                               /* codigo de operacion */
-        uint8_t id;                               /* identificador */
-        uint8_t len;                             /* longitud de datos */
-        char data[MAXDATASIZE - ID_HEADER_LEN];   /* datos */
+    uint8_t op;                               /* codigo de operacion */
+    uint8_t id;                               /* identificador */
+    uint8_t len;                              /* longitud de datos */
+    char data[MAXDATASIZE - ID_HEADER_LEN];   /* datos */
 };
 
 /************************************************************************************************/
