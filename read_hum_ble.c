@@ -33,6 +33,7 @@ float read_hum (uint8_t value, uint8_t* op)
     char command[200];
     uint16_t rawHum = 0;
     uint16_t rawTemp = 0;
+    uint16_t rawSenTer = 0;
     float temp;
     float hum;
     float senTerm;    
@@ -69,6 +70,16 @@ float read_hum (uint8_t value, uint8_t* op)
         char* humBytes = strchr(resp, ':') + 2;
         char strRawHum[5];
         char strRawTemp[5];
+        char strRawSen[5];
+
+        if (strlen(humBytes) == 19) {
+            memset(strRawSen, '\0', 5);
+            strRawSen[0] = humBytes[15];
+            strRawSen[1] = humBytes[16];
+            strRawSen[2] = humBytes[12];
+            strRawSen[3] = humBytes[13];
+            rawSenTer = (uint16_t) strtol(strRawSen, NULL, 16);
+        }
 
         memset(strRawHum, '\0', 5);
         strRawHum[0] = humBytes[9];
@@ -84,14 +95,17 @@ float read_hum (uint8_t value, uint8_t* op)
 
         /* Pasa de string a unsigned int de 16 bits*/
         rawHum = (uint16_t) strtol(strRawHum, NULL, 16);
-        rawTemp = (uint16_t) strtol(strRawTemp, NULL, 16);
-        
+        rawTemp = (uint16_t) strtol(strRawTemp, NULL, 16);        
     } while(rawHum == 0 && rawTemp == 0);
 
     /* Convierte los datos */
     sensorHdc1000Convert(rawTemp, rawHum, &temp, &hum);
     /* Calcula la sensación térmica */
-    calculate_thermal_sesation(temp, hum/100, &senTerm);
+    if(rawSenTer != 0) {
+        senTerm = rawSenTer/1000.0;  // Dividimos por 1000 para convertirlo
+    } else {
+        calculate_thermal_sesation(temp, hum/100, &senTerm);
+    }
 
     /* Pasa el valor que se le pida */
     if (value == AMB_TMP_VALUE) {
